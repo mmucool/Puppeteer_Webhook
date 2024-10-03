@@ -1,0 +1,44 @@
+const puppeteer = require('puppeteer');
+
+async function uploadToTikTok(videoPath, videoDescription) {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+
+    // Переход на страницу TikTok и авторизация
+    await page.goto('https://www.tiktok.com/login');
+    
+    // Здесь необходимо выполнить действия для входа в аккаунт.
+    // Например, если вход через email или соцсети, нужно автоматизировать эти шаги:
+    // - Ввод email/пароля
+    // - Нажатие кнопки входа
+    
+    // После входа в аккаунт, перейти на страницу загрузки видео
+    await page.goto('https://www.tiktok.com/upload');
+
+    // Ожидание загрузки страницы
+    await page.waitForSelector('input[type="file"]');
+
+    // Загрузка видео
+    const inputUploadHandle = await page.$('input[type="file"]');
+    await inputUploadHandle.uploadFile(videoPath);  // Путь к видео
+
+    // Ввод описания видео
+    await page.waitForSelector('.DraftEditor-root');
+    await page.type('.DraftEditor-root', videoDescription);
+
+    // Ожидание завершения загрузки видео
+    await page.waitForTimeout(5000); // Можно изменить в зависимости от размера видео
+
+    // Клик на кнопку публикации
+    await page.click('button.publish-button');  // Подтвердить публикацию
+
+    // Ожидание завершения процесса
+    await page.waitForTimeout(5000);
+
+    console.log('Видео загружено успешно!');
+
+    await browser.close();
+}
+
+// Пример использования
+uploadToTikTok('/path/to/your/video.mp4', 'Описание видео для TikTok');
